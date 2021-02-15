@@ -1,26 +1,59 @@
+import Logout from './components/Logout/Logout'
+import {connect} from 'react-redux'
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-
+import Layout from './hoc/Layout/Layout'
+import Quiz from './containers/Quiz/Quiz.js'
+import {Route,Switch,withRouter} from 'react-router-dom'
+import QuizList from './containers/QuizList/QuizList.js'
+//import QuizList from './containers/QuizList/QuizList.js'
+import Auth from './containers/Auth/Auth.js'
+import QuizCreator from './containers/QuizCreator/QuizCreator.js'
 function App() {
+  componentDidMount(){
+    this.props.authLogin()
+  }
+ 
   return (
+    let routes=(
+      <Switch>
+      <Route path="/auth" component={Auth}></Route>
+      <Route path="/quiz/:id" component={Quiz}></Route>
+      <Route path="/" component={QuizList}></Route>
+      <Redirect to="/"/>
+      </Switch> 
+    )
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      if(this.props.isAuthenticated){
+        routes=(
+          <Switch>
+      <Route path="/quiz/creator" component={QuizCreator}></Route>
+      <Route path="/quiz/:id" component={Quiz}></Route>
+      <Route path="/" exact component={QuizList}></Route>
+      <Route path="/logout" component={Logout}></Route>
+      <Redirect to="/"/>
+      </Switch> 
+        )
+      }
+      <Layout>
+        {/* <div style={{width:400, border:'1px solid black'}}>
+          <h1>Layout</h1>
+        </div> */}
+        
+          {routes}
+         
+      </Layout>
     </div>
   );
 }
 
-export default App;
+function mapStateToProps(state){
+  return {
+    isAuthenticated:!!state.auth.token
+  }
+}
+function mapDispatchToProps(dispatch){
+  return {
+    authLogin:()=>dispatch(autoLogin)
+  }
+}
+export default withRouter(connect(mapStateToProps)(App));
